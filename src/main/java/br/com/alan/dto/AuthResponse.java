@@ -1,17 +1,23 @@
 package br.com.alan.dto;
 
+import java.util.Date;
+
 public class AuthResponse {
-    private String jwt;
 
-    public AuthResponse(String jwt) {
-        this.jwt = jwt;
+    private String token;
+    private Date expiration;
+
+    public AuthResponse(String token, Date expiration) {
+        this.token = token;
+        this.expiration = expiration;
     }
 
-    public String getJwt() {
-        return jwt;
+    public String getToken() {
+        return token;
     }
 
-    public void setJwt(String jwt) {
-        this.jwt = jwt;
+    public Date getExpiration() {
+        return expiration;
     }
+
 }

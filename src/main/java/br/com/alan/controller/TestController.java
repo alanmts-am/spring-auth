@@ -10,7 +10,7 @@ public class TestController {
 
     @GetMapping()
     public String getMethodName() {
-        return new String("sajdfpasda");
+        return new String("Teste de rota autenticada para o membro");
     }
 
 }

@@ -10,7 +10,7 @@ public class AdminController {
 
     @GetMapping("/test")
     public String getAdmin() {
-        return "Acessou a rota";
+        return "Teste de rota autenticada para o admin";
     }
 
 }

@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,26 +28,34 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String authorizationHeader = request.getHeader("Authorization");
+        final String jwt = getBearerToken(authorizationHeader);
+        final String username = jwtTokenUtil.getUsernameFromToken(jwt);
 
-        String username = null;
-        String jwt = null;
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtTokenUtil.getUsernameFromToken(jwt);
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-            if (jwtTokenUtil.validateToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails.getUsername(), userDetails.getPassword(),
-                        userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (username != null && jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            try {
+                authenticateUser(username);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private String getBearerToken(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+
+        return null;
+    }
+
+    private void authenticateUser(String username) throws Exception {
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userDetails.getUsername(), userDetails.getPassword(),
+                userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
     }
 }

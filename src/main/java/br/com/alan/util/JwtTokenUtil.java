@@ -28,22 +28,37 @@ public class JwtTokenUtil {
     }
 
     public Claims getClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public String getUsernameFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();
+        try {
+            return getClaimsFromToken(token).getSubject();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean isTokenExpired(String token) {
-        return getClaimsFromToken(token).getExpiration().before(new Date());
+        try {
+            return getClaimsFromToken(token).getExpiration().before(new Date());
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        if (username != null) {
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        }
+        return false;
     }
 }

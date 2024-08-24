@@ -4,25 +4,34 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.alan.model.Role;
 import br.com.alan.model.User;
+import br.com.alan.model.UserDetailsImpl;
+import br.com.alan.repository.RoleRespository;
 import br.com.alan.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                new ArrayList<>());
-    }
+        @Autowired
+        private RoleRespository roleRespository;
+
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                User user = userRepository.findByUsername(username).get();
+
+                List<Role> roles = roleRespository.findByUserRoles(user.getId());
+                user.setRoles(roles);
+
+                UserDetails userDetails = new UserDetailsImpl(user);
+                return userDetails;
+        }
 }

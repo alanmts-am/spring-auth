@@ -1,14 +1,18 @@
 package br.com.alan.model;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_users")
+@Table(name = "tb_user")
 public class User {
 
     @Id
@@ -20,6 +24,9 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @ManyToMany()
+    private List<Role> roles;
 
     public Long getId() {
         return id;
@@ -43,6 +50,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
 }

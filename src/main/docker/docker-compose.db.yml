@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: spring
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: spring-boot-jwt
+    ports:
+      - "5555:5432"

@@ -1,13 +1,17 @@
 package br.com.alan.service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import br.com.alan.dto.AuthRequest;
@@ -16,7 +20,6 @@ import br.com.alan.model.Role;
 import br.com.alan.model.User;
 import br.com.alan.repository.RoleRespository;
 import br.com.alan.repository.UserRepository;
-import br.com.alan.util.JwtTokenUtil;
 
 @Service
 public class AuthService {
@@ -31,39 +34,47 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtEncoder jwtEncoder;
 
     public void create(AuthRequest userRequest) {
-        if (userRepository.existsByUsername(userRequest.getUsername())) {
+        if (userRepository.existsByUsername(userRequest.username())) {
             throw new RuntimeException("Usuário já existe");
         }
 
-        List<Role> roles = new ArrayList<>();
-
-        Role role = this.roleRespository.findByRole("ROLE_MEMBER").get();
-        roles.add(role);
-
         User user = new User();
-        user.setUsername(userRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        user.setRoles(roles);
+        user.setUsername(userRequest.username());
+        user.setPassword(passwordEncoder.encode(userRequest.password()));
+        Role role = this.roleRespository.findById(Role.Values.MEMBER.getRoleId()).get();
+        user.setRoles(Set.of(role));
 
         userRepository.save(user);
     }
 
     public AuthResponse login(AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
-                        authRequest.getPassword()));
+        var user = userRepository.findByUsername(authRequest.username());
 
-        if (authentication.isAuthenticated()) {
-            final String token = jwtTokenUtil.generateToken(authentication.getName());
-            return new AuthResponse(token, jwtTokenUtil.getClaimsFromToken(token).getExpiration());
+        if (user.isEmpty() || !passwordEncoder.matches(authRequest.password(), user.get().getPassword())) {
+            throw new BadCredentialsException("Usuário ou senha inválidos");
         }
 
-        return null;
+        var now = Instant.now();
+        var expiresIn = 300L;
+
+        var scopes = user.get().getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(" "));
+
+        var claims = JwtClaimsSet.builder()
+                .issuer("auth-jwt")
+                .subject(user.get().getId().toString())
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expiresIn))
+                .claim("scope", scopes)
+                .build();
+
+        var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+        return new AuthResponse(jwtValue, expiresIn);
     }
 }

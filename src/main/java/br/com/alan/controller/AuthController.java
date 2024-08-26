@@ -23,7 +23,7 @@ public class AuthController {
         try {
             return ResponseEntity.ok(authService.login(authRequest));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválida");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 

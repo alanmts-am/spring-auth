@@ -1,7 +1,6 @@
 package br.com.alan.config;
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

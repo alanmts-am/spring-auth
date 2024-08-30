@@ -18,6 +18,7 @@ import br.com.alan.model.Role;
 import br.com.alan.model.User;
 import br.com.alan.repository.RoleRespository;
 import br.com.alan.repository.UserRepository;
+import br.com.alan.util.TokenUtil;
 
 @Service
 public class AuthService {
@@ -32,7 +33,7 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtEncoder jwtEncoder;
+    private TokenUtil tokenUtil;
 
     public void create(AuthRequest userRequest) {
         if (userRepository.existsByUsername(userRequest.username())) {
@@ -55,24 +56,6 @@ public class AuthService {
             throw new BadCredentialsException("Usuário ou senha inválidos");
         }
 
-        var now = Instant.now();
-        var expiresIn = 300L;
-
-        var scopes = user.get().getRoles()
-                .stream()
-                .map(Role::getName)
-                .collect(Collectors.joining(" "));
-
-        var claims = JwtClaimsSet.builder()
-                .issuer("auth-jwt")
-                .subject(user.get().getId().toString())
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiresIn))
-                .claim("scope", scopes)
-                .build();
-
-        var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
-        return new AuthResponse(jwtValue, expiresIn);
+        return new AuthResponse(this.tokenUtil.generate(user.get()));
     }
 }

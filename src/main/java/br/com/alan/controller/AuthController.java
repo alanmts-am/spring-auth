@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.alan.dto.AuthRequest;
+import br.com.alan.model.User;
 import br.com.alan.service.AuthService;
 
 @RestController
@@ -30,8 +31,8 @@ public class AuthController {
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody AuthRequest userRequest) {
         try {
-            authService.create(userRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário criado com sucesso!");
+            User user = authService.create(userRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

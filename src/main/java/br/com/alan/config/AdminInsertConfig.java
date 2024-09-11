@@ -29,7 +29,7 @@ public class AdminInsertConfig implements CommandLineRunner {
 
         var roleAdmin = roleRepository.findById(Role.Values.ADMIN.getRoleId());
 
-        var userAdmin = userRepository.findByUsername("admin");
+        var userAdmin = userRepository.findByLogin("admin");
 
         userAdmin.ifPresentOrElse(
                 user -> {
@@ -37,7 +37,9 @@ public class AdminInsertConfig implements CommandLineRunner {
                 },
                 () -> {
                     var user = new User();
-                    user.setUsername("admin");
+                    user.setName("Administrador");
+                    user.setEmail("admin@teste.com.br");
+                    user.setLogin("admin");
                     user.setPassword(passwordEncoder.encode("admin"));
                     user.setRoles(Set.of(roleAdmin.get()));
                     userRepository.save(user);

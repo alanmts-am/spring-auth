@@ -11,8 +11,8 @@ import br.com.alan.model.User;
 @Repository
 public interface UserRepository extends CrudRepository<User, UUID> {
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByLogin(String login);
 
-    boolean existsByUsername(String username);
+    boolean existsByLogin(String login);
 
 }

@@ -1,15 +1,10 @@
 package br.com.alan.service;
 
-import java.time.Instant;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import br.com.alan.dto.AuthRequest;
@@ -35,22 +30,24 @@ public class AuthService {
     @Autowired
     private TokenUtil tokenUtil;
 
-    public void create(AuthRequest userRequest) {
-        if (userRepository.existsByUsername(userRequest.username())) {
+    public User create(AuthRequest userRequest) {
+        if (userRepository.existsByLogin(userRequest.login())) {
             throw new RuntimeException("Usuário já existe");
         }
 
         User user = new User();
-        user.setUsername(userRequest.username());
+        user.setName(userRequest.name());
+        user.setEmail(userRequest.email());
+        user.setLogin(userRequest.login());
         user.setPassword(passwordEncoder.encode(userRequest.password()));
         Role role = this.roleRespository.findById(Role.Values.MEMBER.getRoleId()).get();
         user.setRoles(Set.of(role));
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public AuthResponse login(AuthRequest authRequest) {
-        var user = userRepository.findByUsername(authRequest.username());
+        var user = userRepository.findByLogin(authRequest.login());
 
         if (user.isEmpty() || !passwordEncoder.matches(authRequest.password(), user.get().getPassword())) {
             throw new BadCredentialsException("Usuário ou senha inválidos");

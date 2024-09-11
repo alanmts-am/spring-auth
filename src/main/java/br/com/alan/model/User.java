@@ -24,10 +24,16 @@ public class User {
     @Column(name = "co_user", columnDefinition = "UUID default gen_random_uuid()")
     private UUID id;
 
-    @Column(name = "no_user", unique = true, nullable = false)
-    private String username;
+    @Column(name = "no_user")
+    private String name;
 
-    @Column(name = "no_pass", nullable = false)
+    @Column(name = "no_email")
+    private String email;
+
+    @Column(name = "ds_login", unique = true, nullable = false)
+    private String login;
+
+    @Column(name = "no_password", nullable = false)
     private String password;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -42,12 +48,28 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {
@@ -65,5 +87,4 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-
 }

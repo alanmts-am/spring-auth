@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:14
-    container_name: postgres_db
+    container_name: spring_api_db
     environment:
       POSTGRES_USER: spring
       POSTGRES_PASSWORD: admin

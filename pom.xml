@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.alan</groupId>
-	<artifactId>spring-boot-jwt</artifactId>
+	<artifactId>spring-auth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>spring-boot-jwt</name>
+	<name>spring-auth</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

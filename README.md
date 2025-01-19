@@ -1,4 +1,4 @@
-# Spring Boot JWT Test
+# Spring Auth Test
 
 ## Private and public key 
 
@@ -30,7 +30,7 @@ mvn spring-boot:run
 ## Run Project (Full Docker)
 
 ```Shell
-sudo docker build -t spring-boot-jwt .
+sudo docker build -t spring-auth .
 ```
 
 ```Shell

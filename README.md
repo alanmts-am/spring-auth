@@ -36,3 +36,11 @@ sudo docker build -t spring-auth .
 ```Shell
 sudo docker compose up -d
 ```
+
+## Postgres UUID
+
+To activate postgres function gen_random_uuid(), run this on database
+
+```SQL
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+```

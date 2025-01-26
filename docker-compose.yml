@@ -5,8 +5,8 @@ services:
     build: 
       dockerfile: Dockerfile
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://172.17.0.1:5433/spring_auth
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_auth
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: admin
     ports:
-      - "8080:8080"
+      - "8000:8080"
